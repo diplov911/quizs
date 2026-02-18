@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 9A Quiz</title>
+
+<style>
+body{
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(135deg,#1d3557,#e63946);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    color:white;
+}
+.home{text-align:center;}
+.home h1{font-size:42px;}
+.start-btn{
+    padding:12px 25px;
+    font-size:18px;
+    border:none;
+    border-radius:8px;
+    background:#f1faee;
+    color:#1d3557;
+    cursor:pointer;
+}
+.start-btn:hover{ background:#a8dadc; }
+
+.container{
+    display:none;
+    background:white;
+    color:#333;
+    width:95%;
+    max-width:800px;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+.scoreboard{
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+    font-weight:bold;
+}
+.score{
+    background:#f1faee;
+    padding:8px 12px;
+    border-radius:8px;
+}
+
+.active-group{
+    text-align:center;
+    font-weight:bold;
+    color:#fff;
+    font-size:22px;
+    margin:10px 0;
+    padding:10px;
+    border-radius:10px;
+}
+.group-a{background:#e63946;}
+.group-b{background:#f1faee; color:#1d3557;}
+.group-c{background:#a8dadc; color:#1d3557;}
+
+.timer{
+    text-align:center;
+    font-size:18px;
+    font-weight:bold;
+    color:#1d3557;
+}
+
+.question{
+    margin:15px 0;
+    font-size:17px;
+}
+
+.options button{
+    display:block;
+    width:100%;
+    padding:10px;
+    margin:6px 0;
+    border:none;
+    border-radius:8px;
+    background:#457b9d;
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+}
+.options button.correct{background:green;}
+.options button.wrong{background:red;}
+.options button:disabled{cursor:default;}
+
+.correct-answer{
+    text-align:center;
+    color:green;
+    font-weight:bold;
+    margin:10px 0;
+}
+
+.result{
+    text-align:center;
+    font-size:18px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.next-btn{
+    display:none;
+    margin:15px auto 0;
+    padding:10px 15px;
+    border:none;
+    border-radius:8px;
+    background:#2a9d8f;
+    color:white;
+    cursor:pointer;
+}
+
+.restart-btn{
+    display:none;
+    margin:15px auto 0;
+    padding:10px 15px;
+    border:none;
+    border-radius:8px;
+    background:#2a9d8f;
+    color:white;
+    cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="home" id="homePage">
+    <h1>🎓 Class 9A Quiz</h1>
+    <button class="start-btn" onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<div class="container" id="quizPage">
+    <div class="scoreboard">
+        <div class="score">Group A: <span id="scoreA">0</span></div>
+        <div class="score">Group B: <span id="scoreB">0</span></div>
+        <div class="score">Group C: <span id="scoreC">0</span></div>
+    </div>
+
+    <div class="active-group" id="activeGroup"></div>
+    <div class="timer">Time Left: <span id="time">15</span> sec</div>
+
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+
+    <div class="correct-answer" id="correctAnswer"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextTurn()">Next Question</button>
+    <div class="result" id="result"></div>
+    <button class="restart-btn" onclick="restartQuiz()">Restart Quiz</button>
+</div>
+
+<script>
+// NORMAL DIFFICULTY QUESTIONS
+const questionsData = [
+{q:"Electron configuration of Magnesium (Mg)?",options:["2,8,2","2,8,3","2,8,1","2,6,2"],answer:0},
+{q:"if the mass of a body is doubled the force is ? ",options:["Double","Triple","Four times","Half"],answer:0},
+{q:"Which blood cells fight infection?",options:["RBC","Platelets","WBC","Plasma"],answer:2},
+{q:"SI unit of pressure?",options:["Pascal","Newton","Joule","Watt"],answer:0},
+{q:"Lens used to correct myopia?",options:["Convex","Concave","Cylindrical","Bifocal"],answer:1},
+{q:"Valency of Aluminium?",options:["1","2","3","4"],answer:2},
+{q:"Nepal's new constitution promulgated in?",options:["2013","2015","2017","2008"],answer:1},
+{q:"Largest lake of Nepal?",options:["Rara","Fewa","Tilicho","Begnas"],answer:0},
+{q:"Province 1 official name?",options:["Koshi","Sagarmatha","Mechi","Janakpur"],answer:0},
+{q:"Derivative of sin x?",options:["cos x","-cos x","tan x","-sin x"],answer:0},
+{q:"Sum of first 20 natural numbers?",options:["200","210","190","220"],answer:1},
+{q:"Identify the figure of speech: 'Time is a thief.'",options:["Simile","Metaphor","Hyperbole","Alliteration"],answer:1},
+{q:"Synonym of 'Meticulous'?",options:["Careless","Detailed","Rough","Quick"],answer:1},
+{q:"Antonym of 'Obsolete'?",options:["Outdated","Modern","Ancient","Old"],answer:1},
+{q:"Which planet has the shortest day?",options:["Earth","Mars","Jupiter","Venus"],answer:2},
+{q:"Chemical symbol of Tungsten?",options:["Tu","W","Tg","Ts"],answer:1},
+{q:"Which layer protects Earth from UV rays?",options:["Troposphere","Stratosphere","Ozone Layer","Mesosphere"],answer:2},
+{q:"Acceleration formula?",options:["v/t","F/m","d/t","m/v"],answer:1},
+{q:"Binary of decimal 5?",options:["101","110","111","100"],answer:0},
+{q:"Smallest unit of life?",options:["Atom","Molecule","Cell","Organ"],answer:2},
+
+// New normal difficulty questions
+{q:"If 3x - 5 = 16, find x.",options:["5","6","7","8"],answer:2},
+
+{q:"A body moving with velocity 20 m/s stops in 4 sec. Acceleration is?",options:["-5 m/s²","5 m/s²","4 m/s²","-4 m/s²"],answer:0},
+
+{q:"If radius of sphere doubles, volume becomes?",options:["2 times","4 times","6 times","8 times"],answer:3},
+
+{q:"Solve: (x+2)(x-2)",options:["x²-4","x²+4","x²-2","x²+2"],answer:0},
+
+{q:"A resistor of 10Ω carries 3A current. Power is?",options:["30W","60W","90W","120W"],answer:2},
+
+{q:"If tan θ = 1 and θ is acute, θ = ?",options:["30°","45°","60°","90°"],answer:1},
+
+{q:"Escape velocity depends on?",options:["Mass only","Radius only","Mass & Radius","Height"],answer:2},
+
+{q:"If density doubles and mass constant, volume becomes?",options:["Half","Double","Same","Zero"],answer:0},
+
+{q:"Derivative of x³?",options:["3x²","x²","3x","x³"],answer:0},
+
+{
+    q: "A car accelerates from 0 to 60 m/s in 10 seconds. What is its acceleration?",
+    options: ["6 m/s²", "0.6 m/s²", "60 m/s²", "10 m/s²"],
+    answer: 0
+},
+
+
+{q:"Main river flowing through Kathmandu?",options:["Bagmati","Koshi","Gandaki","Karnali"],answer:0},
+{q:"Primary gas in Earth's atmosphere?",options:["Oxygen","Carbon dioxide","Nitrogen","Hydrogen"],answer:2},
+{q:"H2O2 is commonly known as?",options:["Hydrogen peroxide","hydrogen oxide","Hydroxide","water"],answer:0},
+
+{q:"Which is the largest continent?",options:["Africa","Asia","Europe","Australia"],answer:1},
+
+{q:"Boiling point of water at sea level?",options:["90°C","100°C","80°C","120°C"],answer:1},
+{q:"Primary colors are?",options:["Red, Green, Blue","Red, Yellow, Blue","Red, Blue, Black","Green, Blue, Yellow"],answer:1},
+];
+
+let currentQuestionIndex = 0;
+let currentGroup = 0;
+let scores = [0,0,0];
+let timer;
+let timeLeft = 15;
+const groupNames=["Group A","Group B","Group C"];
+const groupClasses=["group-a","group-b","group-c"];
+
+function startQuiz(){
+    document.getElementById("homePage").style.display="none";
+    document.getElementById("quizPage").style.display="block";
+    currentQuestionIndex = 0;
+    currentGroup = 0;
+    scores = [0,0,0];
+    updateScores();
+    document.getElementById("nextBtn").style.display="none";
+    document.querySelector(".timer").style.display="block";
+    loadQuestion();
+}
+
+function loadQuestion(){
+    if(currentQuestionIndex >= questionsData.length){endQuiz(); return;}
+    const question = questionsData[currentQuestionIndex];
+    document.getElementById("question").innerText = question.q;
+
+    const activeGroupDiv = document.getElementById("activeGroup");
+    activeGroupDiv.innerText = groupNames[currentGroup]+"'s Turn";
+    activeGroupDiv.className = "active-group "+groupClasses[currentGroup];
+
+    document.getElementById("correctAnswer").innerText = "";
+    document.getElementById("nextBtn").style.display="none";
+
+    const opt = document.getElementById("options");
+    opt.innerHTML="";
+    question.options.forEach((o,i)=>{
+        const btn = document.createElement("button");
+        btn.innerText = o;
+        btn.onclick = ()=>checkAnswer(i,btn);
+        opt.appendChild(btn);
+    });
+
+    timeLeft = 15;
+    document.getElementById("time").innerText = timeLeft;
+    startTimer();
+}
+
+function startTimer(){
+    clearInterval(timer);
+    timer = setInterval(()=>{
+        timeLeft--;
+        document.getElementById("time").innerText = timeLeft;
+        if(timeLeft <= 0){
+            clearInterval(timer);
+            disableOptions();
+            document.getElementById("correctAnswer").innerText = "⏰ Time's up!";
+            document.getElementById("nextBtn").style.display="block";
+        }
+    },1000);
+}
+
+function disableOptions(){
+    const buttons = document.querySelectorAll(".options button");
+    buttons.forEach(b=>b.disabled=true);
+}
+
+function checkAnswer(selected,btn){
+    clearInterval(timer);
+    const question = questionsData[currentQuestionIndex];
+    disableOptions();
+    const buttons = document.querySelectorAll(".options button");
+    const correctIndex = question.answer;
+
+    if(selected===correctIndex){
+        scores[currentGroup]++;
+        btn.classList.add("correct");
+        document.getElementById("correctAnswer").innerText = "✅ Correct!";
+    } else{
+        btn.classList.add("wrong");
+        buttons[correctIndex].classList.add("correct");
+        document.getElementById("correctAnswer").innerText = "❌ Wrong!";
+    }
+
+    updateScores();
+    document.getElementById("nextBtn").style.display="block";
+}
+
+function nextTurn(){
+    currentQuestionIndex++;
+    currentGroup = (currentGroup+1)%3;
+    if(currentQuestionIndex>=questionsData.length){endQuiz(); return;}
+    loadQuestion();
+}
+
+function updateScores(){
+    document.getElementById("scoreA").innerText = scores[0];
+    document.getElementById("scoreB").innerText = scores[1];
+    document.getElementById("scoreC").innerText = scores[2];
+}
+
+function endQuiz(){
+    document.getElementById("question").innerText="";
+    document.getElementById("options").innerHTML="";
+    document.getElementById("correctAnswer").innerText="";
+    document.getElementById("activeGroup").innerText="Quiz Finished!";
+    document.querySelector(".timer").style.display="none";
+    let max = Math.max(...scores);
+    let winners=[];
+    scores.forEach((s,i)=>{if(s===max) winners.push(groupNames[i]);});
+    document.getElementById("result").innerText =
+        winners.length>1?
+        "Tie between "+winners.join(" & ")+"!":
+        winners[0]+" Wins the Quiz! 🎉";
+    document.querySelector(".restart-btn").style.display="block";
+}
+
+function restartQuiz(){
+    document.querySelector(".timer").style.display="block";
+    document.querySelector(".restart-btn").style.display="none";
+    currentQuestionIndex=0;
+    currentGroup=0;
+    scores=[0,0,0];
+    updateScores();
+    loadQuestion();
+}
+</script>
+</body>
+</html>
